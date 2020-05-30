@@ -1768,6 +1768,7 @@ xfce_appfinder_window_execute_command (const gchar          *text,
   gboolean  succeed = FALSE;
   gchar    *action_cmd = NULL;
   gchar    *expanded;
+  GString  *string;
 
   appfinder_return_val_if_fail (error != NULL && *error == NULL, FALSE);
   appfinder_return_val_if_fail (GDK_IS_SCREEN (screen), FALSE);
@@ -1794,7 +1795,15 @@ xfce_appfinder_window_execute_command (const gchar          *text,
 
       /* spawn the command */
       APPFINDER_DEBUG ("spawn \"%s\"", expanded);
-      succeed = xfce_spawn_command_line_on_screen (screen, expanded, FALSE, FALSE, error);
+      if (getenv("WAYLAND_DISPLAY") == NULL)
+        succeed = xfce_spawn_command_line_on_screen (screen, expanded, FALSE, FALSE, error);
+      else
+        {
+          string = g_string_sized_new (100);
+          g_string_append (string, " &");
+          succeed = system(string->str);
+          g_string_free (string, TRUE);
+        }
       g_free (expanded);
     }
 
