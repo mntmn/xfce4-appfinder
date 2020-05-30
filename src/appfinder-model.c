@@ -2375,6 +2375,7 @@ xfce_appfinder_model_execute (XfceAppfinderModel  *model,
   GString         *string;
   gboolean         succeed = FALSE;
   gchar          **argv;
+  int              ret;
 
   appfinder_return_val_if_fail (XFCE_IS_APPFINDER_MODEL (model), FALSE);
   appfinder_return_val_if_fail (iter->stamp == model->stamp, FALSE);
@@ -2434,7 +2435,8 @@ xfce_appfinder_model_execute (XfceAppfinderModel  *model,
       else
         {
           g_string_append (string, " &");
-          succeed = system(string->str);
+          ret = system(string->str);
+          if (ret != -1 && ret != 127) succeed = TRUE;
         }
 
       g_strfreev (argv);
